@@ -1,7 +1,11 @@
 #include "main.h"
 //User global variables
+//For communicate with PC
 FIFO RxBuf;
 FIFO TxBuf;
+//For J1708 parsing
+FIFO J1708_RxBuf;
+FIFO J1708_TxBuf;
 //User init functions 
 void SysInit(void);
 //Main function
@@ -24,6 +28,7 @@ void SysInit(void){
 	//Init periphs
 	GPIO_Init();
 	USART0_Init();
+	USART1_Init();
 	//Clear all of buffers
 	Clear(&RxBuf);
 	Clear(&TxBuf);

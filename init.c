@@ -26,7 +26,27 @@ void USART0_Init(void){
 	usart_enable(USART0);
 
 }
+//This function init USART1 for J1708 bus
+void USART1_Init(void){
+	RCU_APB1EN|=RCU_APB1EN_USART1EN;
+	RCU_APB2EN|=RCU_APB2EN_PAEN;
+	usart_deinit(USART1);
+	usart_baudrate_set(USART1, 9600UL);
+	usart_parity_config(USART1, USART_PM_NONE);
+	usart_transmit_config(USART1, USART_TRANSMIT_ENABLE);
+	usart_receive_config(USART1, USART_RECEIVE_ENABLE);
+	//usart_interrupt_enable(USART0, USART_INT_TBE);
+	usart_interrupt_enable(USART1, USART_INT_RBNE);
+	gpio_afio_deinit();
+	gpio_init(GPIOA, GPIO_MODE_AF_PP, GPIO_OSPEED_50MHZ, GPIO_PIN_2);
+	gpio_init(GPIOA, GPIO_MODE_IPD, GPIO_OSPEED_50MHZ, GPIO_PIN_3);
+	usart_enable(USART1);
+}
+
 //This function init TIM0 for timing definition
 void TIM0_Init(void){
 	timer_deinit(TIMER0);
+	timer_parameter_struct Tim0; 
+	Tim0.prescaler = 48;
+	
 }

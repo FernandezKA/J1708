@@ -21,6 +21,9 @@ void USART1_Init(void);
 void TIM0_Init(void);
 
 //User variables
-
+//For communicate with PC
 extern FIFO RxBuf;
 extern FIFO TxBuf;
+//For J1708 communicate
+extern FIFO J1708_RxBuf;
+extern FIFO J1708_TxBuf;

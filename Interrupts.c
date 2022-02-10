@@ -1,7 +1,7 @@
 #include "main.h"
 #include <stdlib.h>
 #include "Interrupts.h"
-
+//It's IRQ handler for UART_PC
 void USART0_IRQHandler(void){
 	//If receive data - push to the our FIFO buffer
 	if(usart_flag_get(USART0, USART_FLAG_RBNE)){
@@ -15,8 +15,22 @@ void USART0_IRQHandler(void){
 			usart_data_transmit(USART0, Pull(&TxBuf));
 		}
 		else{
-			usart_interrupt_disable(USART0, USART_INT_TBE);
+			//Undefined behaviour
+			//usart_interrupt_disable(USART0, USART_INT_TBE);
 		}
+	}
+	return;
+}
+//It's IRQ handler for j1708 bus
+void USART1_IRQHandler(void){
+	if(usart_flag_get(USART1, USART_FLAG_RBNE)){
+		usart_flag_clear(USART1, USART_FLAG_RBNE);
+	}
+	else if(usart_flag_get(USART1, USART_FLAG_TBE)){
+		
+	}
+	else{
+		
 	}
 	return;
 }
