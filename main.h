@@ -10,4 +10,8 @@
 #include "uart.h"
 //User init functions init
 
+void CLK_Init(void);
 void GPIO_Init(void);
+void USART0_Init(void);
+void USART1_Init(void);
+void TIM1_Init(void);
