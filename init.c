@@ -1,13 +1,15 @@
 #include "main.h"
 
 void CLK_Init(void){
-	rcu_deinit();
+	//rcu_deinit();
+	//rcu_pll_config(RCU_PLLSRC_IRC8M_DIV2, RCU_PLL2_MUL16);
+	//rcu_system_clock_source_config(RCU_CKSYSSRC_IRCM8M);
 	
 }
 
 void GPIO_Init(void){
 	RCU_APB2EN|=RCU_APB2EN_PCEN;
-	gpio_init(GPIOC, GPIO_MODE_OUT_OD, GPIO_OSPEED_10MHZ, GPIO_PIN_13);
+	gpio_init(GPIOC, GPIO_MODE_OUT_OD, GPIO_OSPEED_10MHZ, GPIO_PIN_13);//It's led for indicate activity
 }
 //This function init USART0 for communication with PC
 void USART0_Init(void){
@@ -24,7 +26,6 @@ void USART0_Init(void){
 	gpio_init(GPIOA, GPIO_MODE_AF_PP, GPIO_OSPEED_50MHZ, GPIO_PIN_9);
 	gpio_init(GPIOA, GPIO_MODE_IPD, GPIO_OSPEED_50MHZ, GPIO_PIN_10);
 	usart_enable(USART0);
-
 }
 //This function init USART1 for J1708 bus
 void USART1_Init(void){
@@ -46,7 +47,13 @@ void USART1_Init(void){
 //This function init TIM0 for timing definition
 void TIM0_Init(void){
 	timer_deinit(TIMER0);
-	timer_parameter_struct Tim0; 
-	Tim0.prescaler = 48;
-	
+	timer_parameter_struct tim0; 
+	tim0.prescaler = 80;//0.01 mS for each step	
+	tim0.alignedmode = TIMER_COUNTER_EDGE;
+	tim0.counterdirection = TIMER_COUNTER_UP;
+	tim0.period = 65535;//About 0.81 sec per UIF IRQ
+	//timer_struct_para_init(&tim0);
+	timer_init(TIMER0, &tim0);
+	timer_interrupt_enable(TIMER0, TIMER_INT_UP);//Interrrupt at overflow
+	timer_enable(TIMER0);
 }

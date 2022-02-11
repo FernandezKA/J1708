@@ -34,3 +34,8 @@ void USART1_IRQHandler(void){
 	}
 	return;
 }
+//This IRQ handler for indicate activity
+void TIMER0_UP_IRQHandler(void){
+	timer_interrupt_flag_clear(TIMER0, TIMER_INT_FLAG_UP);
+	GPIO_OCTL(GPIOC)^= (1<<13);
+}
