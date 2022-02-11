@@ -10,6 +10,8 @@ struct j1708{
 
 typedef struct j1708 J1708;
 
+
 bool GetPacket(FIFO* buf, J1708* j1708Packet);
 
+void GetCRC(J1708* packet);
 #endif

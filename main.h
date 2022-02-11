@@ -12,6 +12,7 @@
 #include "fifo.h"
 //User typedefs 
 typedef struct fifo FIFO;
+typedef struct j1708 J1708;
 //User init functions init
 
 void CLK_Init(void);
@@ -27,3 +28,5 @@ extern FIFO TxBuf;
 //For J1708 communicate
 extern FIFO J1708_RxBuf;
 extern FIFO J1708_TxBuf;
+//
+extern J1708 RxStruct;

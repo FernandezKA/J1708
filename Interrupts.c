@@ -37,5 +37,11 @@ void USART1_IRQHandler(void){
 //This IRQ handler for indicate activity
 void TIMER0_UP_IRQHandler(void){
 	timer_interrupt_flag_clear(TIMER0, TIMER_INT_FLAG_UP);
+	if(TIMER_CNT(TIMER0) > 8){//It's next J1708 packet
+		
+	}
+	else{
+		//GetPacket(&J1708_RxBuf, );//
+	}
 	GPIO_OCTL(GPIOC)^= (1<<13);
 }

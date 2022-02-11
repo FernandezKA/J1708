@@ -23,3 +23,11 @@ bool GetPacket(FIFO* buf, J1708* j1708Packet){
 	}
 	return status;
 }
+
+void GetCRC(J1708* packet){
+uint8_t sum = 0;
+	for(uint8_t i = 0; i < packet->Size; ++i){
+		sum+=packet->Data[i];
+	}
+	packet->CRC= sum^0xFF;
+}
