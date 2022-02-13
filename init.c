@@ -44,7 +44,7 @@ void USART1_Init(void){
 	usart_enable(USART1);
 }
 
-//This function init TIM0 for timing definition
+//This function init TIM0 for j1708 arbitrate
 void TIM0_Init(void){
 	RCU_APB2EN|=RCU_APB2EN_TIMER0EN;
 	timer_deinit(TIMER0);
@@ -56,4 +56,18 @@ void TIM0_Init(void){
 	timer_init(TIMER0, &tim0);
 	timer_interrupt_enable(TIMER0, TIMER_INT_UP);//Interrrupt at overflow
 	timer_enable(TIMER0);
+}
+//This function init TIM1 for device activity and general timing definition
+void TIM1_Init(void){
+	RCU_APB1EN|=RCU_APB1EN_TIMER1EN;
+	timer_deinit(TIMER1);
+	timer_deinit(TIMER1);
+	timer_parameter_struct tim1; 
+	tim1.prescaler = 48000;//0.01 mS for each step	
+	tim1.alignedmode = TIMER_COUNTER_EDGE;
+	tim1.counterdirection = TIMER_COUNTER_UP;
+	tim1.period = 1000;//About 0.81 sec per UIF IRQ
+	timer_init(TIMER1, &tim1);
+	timer_interrupt_enable(TIMER1, TIMER_INT_UP);//Interrrupt at overflow
+	timer_enable(TIMER1);
 }

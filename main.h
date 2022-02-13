@@ -13,6 +13,10 @@
 //User typedefs 
 typedef struct fifo FIFO;
 typedef struct j1708 J1708;
+//User defines 
+#define PC_UART USART0
+#define J1708_UART USART1
+
 //User init functions init
 
 void CLK_Init(void);
@@ -20,6 +24,7 @@ void GPIO_Init(void);
 void USART0_Init(void);
 void USART1_Init(void);
 void TIM0_Init(void);
+void TIM1_Init(void);
 
 //User variables
 //For communicate with PC
