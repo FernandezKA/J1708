@@ -15,6 +15,7 @@ void USART0_IRQHandler(void){
 			usart_data_transmit(PC_UART, Pull(&TxBuf));
 		}
 		else{
+			usart_interrupt_disable(PC_UART, USART_INT_TBE);
 			//Undefined behaviour
 			//usart_interrupt_disable(USART0, USART_INT_TBE);
 		}

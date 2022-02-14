@@ -23,7 +23,7 @@ int main(){
 	for(;;){
 		//Get send our data
 		if(GetSize(&TxBuf) != 0){
-			usart_interrupt_enable(USART0, USART_INT_TBE);
+			usart_interrupt_enable(PC_UART, USART_INT_TBE);
 		}
 		//Get parse received data
 		if(GetSize(&RxBuf) != 0){

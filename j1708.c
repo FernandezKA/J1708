@@ -1,4 +1,22 @@
 #include "j1708.h"
+static inline void SendJ1708Packet(J1708* pckt, FIFO* Buf, bool isValid){
+	if(isValid){
+		 Push(Buf, pckt->MID);
+		for(uint16_t i = 0; i < pckt->Size; ++i){
+			Push(Buf, pckt->Data[i]);
+		}
+		Push(Buf, pckt->CRC);
+	}
+	else{
+		Push(Buf, '#');
+		Push(Buf, pckt->MID);
+		for(uint16_t i = 0; i < pckt->Size; ++i){
+			Push(Buf, pckt->Data[i]);
+		}
+		Push(Buf, pckt->CRC);
+	}
+}
+
 //This function parse input FIFO buffer at J1708 packet
 bool GetPacket(FIFO* buf, J1708* j1708Packet){
 	bool status = FALSE;
@@ -14,9 +32,11 @@ bool GetPacket(FIFO* buf, J1708* j1708Packet){
 				GetCRC(j1708Packet);
 				if(cCRC == j1708Packet->CRC){
 					//TODO: Send packet
+					SendJ1708Packet(j1708Packet, &TxBuf, TRUE);
 				}
 				else{
 					//TODO: Send packet with invalid marker
+					SendJ1708Packet(j1708Packet, &TxBuf, FALSE);
 				}
 			}
 			else{//It's a data packets
