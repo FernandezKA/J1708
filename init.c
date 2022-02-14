@@ -45,14 +45,15 @@ void USART1_Init(void){
 }
 
 //This function init TIM0 for j1708 arbitrate
+//Each clock is 1 uS
 void TIM0_Init(void){
 	RCU_APB2EN|=RCU_APB2EN_TIMER0EN;
 	timer_deinit(TIMER0);
 	timer_parameter_struct tim0; 
-	tim0.prescaler = 48000;//0.01 mS for each step	
+	tim0.prescaler = 1070;//0.01 mS for each step	
 	tim0.alignedmode = TIMER_COUNTER_EDGE;
 	tim0.counterdirection = TIMER_COUNTER_UP;
-	tim0.period = 1000;//About 0.81 sec per UIF IRQ
+	tim0.period = 100000;//About 0.81 sec per UIF IRQ
 	timer_init(TIMER0, &tim0);
 	timer_interrupt_enable(TIMER0, TIMER_INT_UP);//Interrrupt at overflow
 	timer_enable(TIMER0);
@@ -63,10 +64,10 @@ void TIM1_Init(void){
 	timer_deinit(TIMER1);
 	timer_deinit(TIMER1);
 	timer_parameter_struct tim1; 
-	tim1.prescaler = 48000;//0.01 mS for each step	
+	tim1.prescaler = 10700;//0.01 mS for each step	
 	tim1.alignedmode = TIMER_COUNTER_EDGE;
 	tim1.counterdirection = TIMER_COUNTER_UP;
-	tim1.period = 1000;//About 0.81 sec per UIF IRQ
+	tim1.period = 5000;//About 0.81 sec per UIF IRQ
 	timer_init(TIMER1, &tim1);
 	timer_interrupt_enable(TIMER1, TIMER_INT_UP);//Interrrupt at overflow
 	timer_enable(TIMER1);

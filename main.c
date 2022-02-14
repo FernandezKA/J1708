@@ -29,6 +29,9 @@ int main(){
 		if(GetSize(&RxBuf) != 0){
 				Push(&TxBuf, Pull(&RxBuf));
 		}
+		if(GetSize(&J1708_RxBuf) != 0 && TIMER_CNT(TIMER0) > 803){
+				 GetPacket(&J1708_RxBuf, &RxStruct);
+		}
 	}
 }
 //This function combined all of init functions

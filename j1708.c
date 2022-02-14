@@ -10,7 +10,14 @@ bool GetPacket(FIFO* buf, J1708* j1708Packet){
 				j1708Packet->MID =(uint8_t) Pull(buf);
 			}
 			else if (i == (j1708Packet-> Size -1)){//It's a CRC data
-				j1708Packet->CRC = (uint8_t) Pull(buf);
+				uint8_t cCRC = (uint8_t) Pull(buf);
+				GetCRC(j1708Packet);
+				if(cCRC == j1708Packet->CRC){
+					//TODO: Send packet
+				}
+				else{
+					//TODO: Send packet with invalid marker
+				}
 			}
 			else{//It's a data packets
 				j1708Packet->Data[i - 1] =(uint8_t) Pull(buf);

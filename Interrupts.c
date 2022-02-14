@@ -25,16 +25,8 @@ void USART0_IRQHandler(void){
 void USART1_IRQHandler(void){                  //Receive from j1708  bus
 	if(usart_flag_get(J1708_UART, USART_FLAG_RBNE)){ 
 		usart_flag_clear(J1708_UART, USART_FLAG_RBNE);
-		 if(TIMER_CNT(TIMER0) > 8) {                           //It's a new packet 
-			Push(&J1708_RxBuf, usart_data_receive(J1708_UART));
-			GetPacket(&J1708_RxBuf, &RxStruct);
-			TIMER_CNT(TIMER0) = 0;
-		 }
-		 else{                   //Add to out packet
-			 Push(&J1708_RxBuf, (uint8_t) usart_data_receive(J1708_UART));
-			 TIMER_CNT(TIMER0) = 0;
-		 }
-		
+		TIMER_CNT(TIMER0) = 0;
+		Push(&J1708_RxBuf, usart_data_receive(J1708_UART));
 	}
 	else if(usart_flag_get(J1708_UART, USART_FLAG_TBE)){ //Transmit to j1708 bus
 		
