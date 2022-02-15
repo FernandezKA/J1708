@@ -1,21 +1,21 @@
 #include "j1708.h"
+//This function need to send parsed j1708 packet at PC with RS232 
 static inline void SendJ1708Packet(J1708* pckt, FIFO* Buf, bool isValid){
-	if(isValid){
-		 Push(Buf, pckt->MID);
-		for(uint16_t i = 0; i < pckt->Size; ++i){
-			Push(Buf, pckt->Data[i]);
-		}
-		Push(Buf, pckt->CRC);
+	if(!isValid){
+		 Push(Buf, 0xFF);
 	}
-	else{
-		Push(Buf, '#');
-		Push(Buf, pckt->MID);
-		for(uint16_t i = 0; i < pckt->Size; ++i){
-			Push(Buf, pckt->Data[i]);
-		}
-		Push(Buf, pckt->CRC);
+		for(uint16_t i = 0; i < pckt -> Size; ++i){
+			 if(i == 0){
+				 Push(Buf, pckt->MID);
+			 }
+			 else if(i == pckt->Size - 1){
+					Push(Buf, pckt-> CRC);
+			 }
+			 else{
+				 Push(Buf, pckt->Data[i - 1]);
+			 }
+		 }
 	}
-}
 
 //This function parse input FIFO buffer at J1708 packet
 bool GetPacket(FIFO* buf, J1708* j1708Packet){
@@ -53,7 +53,7 @@ bool GetPacket(FIFO* buf, J1708* j1708Packet){
 
 void GetCRC(J1708* packet){
 uint8_t sum = 0;
-	for(uint8_t i = 0; i < packet->Size; ++i){
+	for(uint8_t i = 0; i < packet->Size - 2; ++i){
 		sum+=packet->Data[i];
 	}
 	packet->CRC= sum^0xFF;

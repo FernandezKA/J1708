@@ -1,5 +1,6 @@
 #include "main.h"
 //#include "j1708.h"
+#define PCKT_DELAY 803U
 //User global variables
 typedef struct j1708 J1708;
 //For communicate with PC
@@ -20,17 +21,22 @@ int main(){
 	nvic_irq_enable(USART1_IRQn, 	1, 1);//For J1708 UART IRQ
 	nvic_irq_enable(TIMER0_UP_IRQn, 2, 2);//For timming definition
 	nvic_irq_enable(TIMER1_IRQn, 3, 3) ; //For led indicate activity
+	//User main variables
+	bool isParsed = FALSE;
+	//Infinite loop
 	for(;;){
+		/*This part of code for send parsed J1708 packet*/
 		//Get send our data
-		if(GetSize(&TxBuf) != 0){
+		if((GetSize(&TxBuf) != 0) && isParsed){
 			usart_interrupt_enable(PC_UART, USART_INT_TBE);
 		}
-		//Get parse received data
-		if(GetSize(&RxBuf) != 0){
-				Push(&TxBuf, Pull(&RxBuf));
+		else{
+			 isParsed = FALSE;
 		}
-		if(GetSize(&J1708_RxBuf) != 0 && TIMER_CNT(TIMER0) > 803){
-				 GetPacket(&J1708_RxBuf, &RxStruct);
+		/*This part of code for parse input j1708 packets*/
+		//Get parse received data
+		if(GetSize(&J1708_RxBuf) != 0 && TIMER_CNT(TIMER0) > PCKT_DELAY){
+				 isParsed = GetPacket(&J1708_RxBuf, &RxStruct);
 		}
 	}
 }

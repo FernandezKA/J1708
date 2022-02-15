@@ -6,7 +6,6 @@ void USART0_IRQHandler(void){
 	//If receive data - push to the our FIFO buffer
 	if(usart_flag_get(PC_UART, USART_FLAG_RBNE)){
 		UART_PC_RX(usart_data_receive(PC_UART), &RxBuf); 
-		//usart_data_transmit(USART0, 0x64);
 		usart_flag_clear(PC_UART, USART_FLAG_RBNE);
 	}
 	//If we have unsended data into TX FIFO buf, send as TXBuff is empty
@@ -16,8 +15,7 @@ void USART0_IRQHandler(void){
 		}
 		else{
 			usart_interrupt_disable(PC_UART, USART_INT_TBE);
-			//Undefined behaviour
-			//usart_interrupt_disable(USART0, USART_INT_TBE);
+			Clear(&TxBuf);
 		}
 	}
 	return;
@@ -30,7 +28,7 @@ void USART1_IRQHandler(void){                  //Receive from j1708  bus
 		Push(&J1708_RxBuf, usart_data_receive(J1708_UART));
 	}
 	else if(usart_flag_get(J1708_UART, USART_FLAG_TBE)){ //Transmit to j1708 bus
-		
+
 	}
 	else{	//Undefined behaviour
 		

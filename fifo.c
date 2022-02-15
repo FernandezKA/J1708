@@ -16,7 +16,14 @@ void Push(FIFO* buf, uint32_t data){
 }
 
 uint32_t Pull(FIFO* buf){
-	return buf->Data[buf->Tail++];
+	if(buf->Tail +1 != buf-> Head){
+		return buf->Data[buf->Tail++];
+	}
+	else{
+		uint32_t data = buf->Data[buf->Tail++];
+		Clear(buf);
+		return data;
+	}
 }
 
 uint16_t GetSize(FIFO* buf){
