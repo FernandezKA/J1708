@@ -1,17 +1,21 @@
 #include "uart.h"
-//This IRQ handler for UART_PC
-void UART_PC_RX(const volatile uint32_t data, FIFO* buf){
-	Push(buf, data);
-	return;	
-}
-//This IRQ handler for j1708 bus
-void UART_J1708_RX(const volatile uint32_t data, FIFO* buf, bool isEnd){
-	if(!isEnd){//Time less or equal then interbyte space
-		Push(buf, data);
+
+
+void print(char* pMsg){
+	uint8_t countSend = 0;
+	char lastChar = 0;
+	char currChar = 0;
+	bool isEnd = FALSE;
+	while(!isEnd && countSend != 0xFF){
+		lastChar = currChar;
+		currChar = pMsg[countSend++];
+		if((lastChar == 0x0A) && (currChar == 0x0D)){
+			 isEnd = TRUE;
+		}
+		else if((lastChar == 0x0D) && (currChar == 0x0A)){
+			 isEnd = TRUE;
+		}
+		while((USART_STAT(PC_UART)&USART_STAT_TBE) != USART_STAT_TBE){__NOP();}
+		usart_data_transmit(PC_UART, currChar);
 	}
-	else{//It's all of packet
-		Push(buf, data);
-		//TODO: Add parser calling
-	}
-	return;
 }

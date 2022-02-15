@@ -1,41 +1,43 @@
 #include "fifo.h"
 
-void FifoInit(FIFO* buf){
+void FifoInit(FIFO *buf)
+{
 	buf->Head = 0x00;
 	buf->Tail = 0x00;
 }
 
-void Push(FIFO* buf, uint32_t data){
-	if(GetSize(buf) == 0xFF){
+void Push(FIFO *buf, uint32_t data)
+{
+	if (GetSize(buf) == 0xFF)
+	{
 		buf->Head = 0x00;
 		buf->Data[buf->Head++] = data;
 	}
-	else{
+	else
+	{
 		buf->Data[buf->Head++] = data;
 	}
 }
 
-uint32_t Pull(FIFO* buf){
-	if(buf->Tail +1 != buf-> Head){
-		return buf->Data[buf->Tail++];
+uint32_t Pull(FIFO *buf)
+{
+	return buf->Data[buf->Tail++];
+}
+
+uint16_t GetSize(FIFO *buf)
+{
+	if (buf->Head > buf->Tail)
+	{
+		return buf->Head - buf->Tail;
 	}
-	else{
-		uint32_t data = buf->Data[buf->Tail++];
-		Clear(buf);
-		return data;
+	else
+	{
+		return 0;
 	}
 }
 
-uint16_t GetSize(FIFO* buf){
-		if(buf->Head > buf->Tail){
-			return buf -> Head - buf -> Tail;
-		}
-		else{
-			return 0;
-		}
-}
-
-void Clear(FIFO* buf){
+void Clear(FIFO *buf)
+{
 	buf->Head = 0x00;
 	buf->Tail = 0x00;
 }
