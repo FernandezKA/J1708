@@ -90,7 +90,7 @@ int main()
 			 switch(RecievedPacket){
 				 case getPriority:
 					TxStruct.Priority =(uint16_t) Pull(&RxBuf);
-					if(TxStruct.Priority > 8){
+					if(TxStruct.Priority < 1 || TxStruct.Priority > 8){
 						print("Invalid priority. Buffer clean \n\r");
 						Clear(&RxBuf);
 						RecievedPacket = getPriority; 
