@@ -102,7 +102,14 @@ int main()
 				 
 				 case getSize: 
 					TxStruct.Size =(uint8_t) Pull(&RxBuf);
-					RecievedPacket = getMID;				 
+					if(TxStruct.Size > 64){
+						print("Invalid size \n\r");
+						Clear(&RxBuf);
+						RecievedPacket = getPriority;
+					}
+					else{
+						RecievedPacket = getMID;				 
+					}
 				 break;
 				 
 				 case getMID:
