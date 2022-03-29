@@ -1,7 +1,26 @@
 #include "main.h"
+#include "cdc_core.h"
 // User defines
 #define PCKT_DELAY 803U
 // User global variables
+/*******************************************************************************/
+// For usbd implementation
+extern uint8_t packet_sent, packet_receive;
+extern uint32_t receive_length;
+extern uint8_t usb_data_buffer[CDC_ACM_DATA_PACKET_SIZE];
+
+usbd_core_handle_struct usb_device_dev =
+	{
+		.dev_desc = (uint8_t *)&device_descriptor,
+		.config_desc = (uint8_t *)&configuration_descriptor,
+		.strings = usbd_strings,
+		.class_init = cdc_acm_init,
+		.class_deinit = cdc_acm_deinit,
+		.class_req_handler = cdc_acm_req_handler,
+		.class_data_handler = cdc_acm_data_handler};
+
+/*******************************************************************************/
+
 // For communicate with PC
 FIFO RxBuf;
 FIFO TxBuf;
@@ -23,6 +42,8 @@ int main()
 	nvic_irq_enable(USART1_IRQn, 1, 1);	   // For J1708 UART IRQ
 	nvic_irq_enable(TIMER0_UP_IRQn, 2, 2); // For timming definition
 	nvic_irq_enable(TIMER1_IRQn, 3, 3);	   // For led indicate activity
+	nvic_priority_group_set(NVIC_PRIGROUP_PRE1_SUB3);
+	nvic_irq_enable(USBD_LP_CAN0_RX0_IRQn, 1, 1);
 	// User main variables
 	static bool isParsed = FALSE;
 	static bool is_J1708_Completed = FALSE;
@@ -57,7 +78,7 @@ int main()
 		/********************************************************************/
 		/*Input packet struct:
 		 *Priority  (1 - 8)
-		 *Size      (Max buff size 256U)
+		 *Size      (Max buff size 64U)
 		 *MID       (0-68)
 		 *Data
 		 */
@@ -152,6 +173,7 @@ static inline void SysInit(void)
 	// Init periphs
 	CLK_Init();
 	GPIO_Init();
+	usbd_core_init(&usb_device_dev);
 	USART0_Init();
 	USART1_Init();
 	TIM0_Init();

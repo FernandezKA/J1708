@@ -50,3 +50,5 @@ RTE/Device/GD32F103C8/system_gd32f10x.c
 RTE/Device/GD32F103C8/gd32f10x_usart.c
 
 Objects/J1708.hex
+*.crf
+*.lst

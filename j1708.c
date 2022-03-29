@@ -1,7 +1,7 @@
 #include "j1708.h"
 
 // This function need to send parsed j1708 packet at PC with RS232
-static inline void SendJ1708Packet(J1708 *pckt, FIFO *Buf, bool isValid)
+void SendJ1708Packet(J1708 *pckt, FIFO *Buf, bool isValid)
 {
 	if (!isValid)
 	{

@@ -5,6 +5,13 @@ void CLK_Init(void)
 	// rcu_deinit();
 	// rcu_pll_config(RCU_PLLSRC_IRC8M_DIV2, RCU_PLL2_MUL16);
 	// rcu_system_clock_source_config(RCU_CKSYSSRC_IRCM8M);
+	RCU_APB2EN |= RCU_APB2EN_PCEN | RCU_APB2EN_PAEN;
+	rcu_periph_clock_enable(RCU_USBD);
+	rcu_ckout0_config(RCU_CKOUT0SRC_CKSYS);
+	rcu_usb_clock_config(RCU_CKUSB_CKPLL_DIV1_5);
+	gpio_init(GPIOC, GPIO_MODE_OUT_OD, GPIO_OSPEED_10MHZ, GPIO_PIN_13); // It's led for indicate activity
+	gpio_init(GPIOA, GPIO_MODE_AF_PP, GPIO_OSPEED_50MHZ, GPIO_PIN_11);	// usb
+	gpio_init(GPIOA, GPIO_MODE_AF_PP, GPIO_OSPEED_50MHZ, GPIO_PIN_12);	// usb
 }
 
 void GPIO_Init(void)

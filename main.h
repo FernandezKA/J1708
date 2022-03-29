@@ -1,4 +1,7 @@
 #include <stdint.h>
+#include <stdbool.h>
+#define TRUE true
+#define FALSE false
 // MCU lib include
 #include <gd32f10x.h>
 #include <gd32f10x_gpio.h>

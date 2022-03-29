@@ -25,7 +25,7 @@ MID+Data+CRC
 If the calculated CRC value does not match the received one, then the packet will be output in the format
 0xFF+MID+Data+calc. CRC
 
-Sending a packet to the J1708 bus:
+Sending a packet to the J1708 bus
 
 To send data to J1708, you need to send a packet via RS232 in the following format
 

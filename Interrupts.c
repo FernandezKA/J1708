@@ -1,6 +1,7 @@
 #include "main.h"
 #include <stdlib.h>
 #include "Interrupts.h"
+#include "usbd_int.h"
 // It's IRQ handler for UART_PC
 void USART0_IRQHandler(void)
 {
@@ -61,4 +62,9 @@ void TIMER1_IRQHandler(void)
 {
 	timer_interrupt_flag_clear(TIMER1, TIMER_INT_FLAG_UP);
 	GPIO_OCTL(GPIOC) ^= (1 << 13);
+}
+
+void USBD_LP_CAN0_RX0_IRQHandler(void)
+{
+	usbd_isr();
 }
