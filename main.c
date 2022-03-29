@@ -16,8 +16,8 @@ usbd_core_handle_struct usb_device_dev =
 		.class_init = cdc_acm_init,
 		.class_deinit = cdc_acm_deinit,
 		.class_req_handler = cdc_acm_req_handler,
-		.class_data_handler = cdc_acm_data_handler};
-
+		.class_data_handler = cdc_acm_data_handler
+};
 /*******************************************************************************/
 
 // For communicate with PC
@@ -38,7 +38,6 @@ static inline void usbd_polling(void);
 int main()
 {
 	SysInit();
-	nvic_irq_enable(USART0_IRQn, 2, 1);	   // For UART0_PC
 	nvic_irq_enable(USART1_IRQn, 1, 1);	   // For J1708 UART IRQ
 	nvic_irq_enable(TIMER0_UP_IRQn, 2, 2); // For timming definition
 	nvic_irq_enable(TIMER1_IRQn, 3, 3);	   // For led indicate activity
@@ -48,7 +47,7 @@ int main()
 	static bool isParsed = FALSE;
 	static bool is_J1708_Completed = FALSE;
 	static uint16_t countDataParsed = 0;
-	static uint8_t sendedDataVCP = 0;
+	static uint8_t  sendedDataVCP = 0;
 	// Infinite loop
 	for (;;)
 	{
@@ -98,6 +97,7 @@ int main()
 			{
 				// Get send packet
 				SendPacket(&TxStruct, &J1708_TxBuf);
+				print("Sended\n\r");
 				is_J1708_Completed = TRUE;
 			}
 		}
@@ -167,7 +167,6 @@ int main()
 					TxStruct.Data[countDataParsed] = (uint8_t)Pull(&RxBuf);
 					countDataParsed = 0;
 					RecievedPacket = Complete;
-					print("Packed completed\n\r");
 					Clear(&RxBuf);
 				}
 				break;
@@ -189,7 +188,6 @@ static inline void SysInit(void)
 	CLK_Init();
 	GPIO_Init();
 	usbd_core_init(&usb_device_dev);
-	// USART0_Init();
 	USART1_Init();
 	TIM0_Init();
 	TIM1_Init();
