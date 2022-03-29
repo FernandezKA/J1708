@@ -64,7 +64,7 @@ int main()
 			{
 				usb_data_buffer[sendedDataVCP++] = Pull(&TxBuf);
 			}
-			cdc_acm_data_send(&usb_de, sendedDataVCP);
+			cdc_acm_data_send(&usb_device_dev, sendedDataVCP);
 			sendedDataVCP = 0;
 		}
 		else
@@ -167,7 +167,8 @@ int main()
 					TxStruct.Data[countDataParsed] = (uint8_t)Pull(&RxBuf);
 					countDataParsed = 0;
 					RecievedPacket = Complete;
-					print("Packet completed\n\r");
+					print("Packed completed\n\r");
+					Clear(&RxBuf);
 				}
 				break;
 
