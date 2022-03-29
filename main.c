@@ -48,8 +48,7 @@ int main()
 	static bool isParsed = FALSE;
 	static bool is_J1708_Completed = FALSE;
 	static uint16_t countDataParsed = 0;
-	print("J1708 adapter\n\r");
-	print("2022-03-29 ver. 1.0\n\r");
+	static uint8_t sendedDataVCP = 0;
 	// Infinite loop
 	for (;;)
 	{
@@ -58,9 +57,15 @@ int main()
 		/********************************************************************/
 		/*This part of code for send parsed J1708 packet*/
 		// Get send our data
-		if ((GetSize(&TxBuf) != 0) && isParsed)
+		if ((0 != GetSize(&TxBuf)) && isParsed)
 		{
-			usart_interrupt_enable(PC_UART, USART_INT_TBE);
+			// usart_interrupt_enable(PC_UART, USART_INT_TBE);
+			while (0 != GetSize(&TxBuf))
+			{
+				usb_data_buffer[sendedDataVCP++] = Pull(&TxBuf);
+			}
+			cdc_acm_data_send(&usb_de, sendedDataVCP);
+			sendedDataVCP = 0;
 		}
 		else
 		{
@@ -74,9 +79,8 @@ int main()
 			Clear(&J1708_RxBuf);
 		}
 		/********************************************************************/
-		
+		// Check state of USBD VCP for new data bytes
 		usbd_polling();
-		
 		// This part of code for RS232 -> J1708 parsing
 		/********************************************************************/
 		/*Input packet struct:
@@ -184,7 +188,7 @@ static inline void SysInit(void)
 	CLK_Init();
 	GPIO_Init();
 	usbd_core_init(&usb_device_dev);
-	//USART0_Init();
+	// USART0_Init();
 	USART1_Init();
 	TIM0_Init();
 	TIM1_Init();
@@ -208,7 +212,7 @@ static inline void usbd_polling(void)
 		{
 			if (0 != receive_length)
 			{
-				// cdc_acm_data_send(&usb_device_dev, receive_length);
+				//cdc_acm_data_send(&usb_device_dev, receive_length);
 				for (uint8_t i = 0; i < receive_length; ++i)
 				{
 					Push(&RxBuf, usb_data_buffer[i]);

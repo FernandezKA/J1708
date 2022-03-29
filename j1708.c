@@ -36,7 +36,7 @@ bool GetPacket(FIFO *buf, J1708 *j1708Packet)
 		{
 			if (i == 0)
 			{ // It's a MID data
-				j1708Packet->MID = (uint8_t)Pull(buf);
+				j1708Packet->MID = (uint8_t) Pull(buf);
 			}
 			else if (i == (j1708Packet->Size - 1))
 			{ // It's a CRC data
