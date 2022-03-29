@@ -9,6 +9,9 @@
 #include <gd32f10x_timer.h>
 #include <gd32f10x_misc.h>
 #include <gd32f10x_usart.h>
+
+#include "usbd_int.h"
+#include "cdc_core.h"
 // User inludes
 #include "j1708.h"
 #include "uart.h"
@@ -41,3 +44,9 @@ extern J1708 RxStruct;
 extern J1708 TxStruct;
 
 extern enum RS232_FSM RecievedPacket;
+//For usbd VCP
+extern usbd_core_handle_struct usb_device_dev;
+
+extern uint8_t packet_sent, packet_receive;
+extern uint32_t receive_length;
+extern uint8_t usb_data_buffer[CDC_ACM_DATA_PACKET_SIZE];

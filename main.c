@@ -1,5 +1,4 @@
 #include "main.h"
-#include "cdc_core.h"
 // User defines
 #define PCKT_DELAY 803U
 // User global variables
@@ -34,6 +33,7 @@ J1708 TxStruct;
 enum RS232_FSM RecievedPacket = getPriority;
 // User static functions definition
 static inline void SysInit(void);
+static inline void usbd_polling(void);
 /*********************************************************************/
 int main()
 {
@@ -48,8 +48,8 @@ int main()
 	static bool isParsed = FALSE;
 	static bool is_J1708_Completed = FALSE;
 	static uint16_t countDataParsed = 0;
-	print("J1708 adapter \n\r");
-	print("2022-02-15 ver. 0.1\n\r");
+	print("J1708 adapter\n\r");
+	print("2022-03-29 ver. 1.0\n\r");
 	// Infinite loop
 	for (;;)
 	{
@@ -74,6 +74,9 @@ int main()
 			Clear(&J1708_RxBuf);
 		}
 		/********************************************************************/
+		
+		usbd_polling();
+		
 		// This part of code for RS232 -> J1708 parsing
 		/********************************************************************/
 		/*Input packet struct:
@@ -83,7 +86,7 @@ int main()
 		 *Data
 		 */
 		/*****************************************************************/
-		// Get check for packet complete
+		// Get check for packet complete, send on j1708 bus
 		if (RecievedPacket == Complete)
 		{
 			// Check priority timings
@@ -97,70 +100,77 @@ int main()
 		// When all of data is sended, reset flag
 		if (GetSize(&J1708_TxBuf) != 0 && is_J1708_Completed)
 		{
-			//TODO Add push to FIFO Buf PC
 			usart_interrupt_enable(J1708_UART, USART_INT_TBE);
 			RecievedPacket = getPriority;
 			is_J1708_Completed = FALSE;
 			TIMER_CNT(TIMER0) = 0;
 		}
-		
-		
-		
-		//Get parse Rx UART_PC
-		if(GetSize(&RxBuf)!= 0){
-			 switch(RecievedPacket){
-				 case getPriority:
-					TxStruct.Priority =(uint16_t) Pull(&RxBuf);
-					if(TxStruct.Priority < 1 || TxStruct.Priority > 8){
-						print("Invalid priority. Buffer clean \n\r");
-						Clear(&RxBuf);
-						RecievedPacket = getPriority; 
-					}
-					else{
+
+		// Get parse Rx UART_PC
+		if (GetSize(&RxBuf) != 0)
+		{
+			switch (RecievedPacket)
+			{
+			case getPriority:
+				TxStruct.Priority = (uint16_t)Pull(&RxBuf);
+				if (TxStruct.Priority < 1 || TxStruct.Priority > 8)
+				{
+					print("Invalid priority. Buffer clean \n\r");
+					Clear(&RxBuf);
+					RecievedPacket = getPriority;
+				}
+				else
+				{
 					RecievedPacket = getSize;
-					}
-				 break;
-				 
-				 case getSize: 
-					TxStruct.Size =(uint8_t) Pull(&RxBuf);
-					if(TxStruct.Size > 64){
-						print("Invalid size. Buffer clean \n\r");
-						Clear(&RxBuf);
-						RecievedPacket = getPriority;
-					}
-					else{
-						RecievedPacket = getMID;				 
-					}
-				 break;
-				 
-				 case getMID:
-					TxStruct.MID = (uint8_t) Pull(&RxBuf);
-					if(TxStruct.MID > 68){
-						print("Invalid MID. Buffer clean \n\r");
-						Clear(&RxBuf);
-						RecievedPacket = getPriority;
-					}
-					else{
-						RecievedPacket = getData;
-					}
-				 break;
-				 
-				 case getData:
-					 if (countDataParsed < TxStruct.Size - 1){
-						TxStruct.Data[countDataParsed++] =(uint8_t) Pull(&RxBuf); 
-					 }
-					 else{
-						TxStruct.Data[countDataParsed] =(uint8_t) Pull(&RxBuf);
-						countDataParsed = 0;
-						RecievedPacket = Complete;
-						print("Packet completed\n\r");
-					 }
-				 break;
-				 
-				 case Complete:
-					__NOP();
-				 break;
-			 }
+				}
+				break;
+
+			case getSize:
+				TxStruct.Size = (uint8_t)Pull(&RxBuf);
+				if (TxStruct.Size > 64)
+				{
+					print("Invalid size. Buffer clean \n\r");
+					Clear(&RxBuf);
+					RecievedPacket = getPriority;
+				}
+				else
+				{
+					RecievedPacket = getMID;
+				}
+				break;
+
+			case getMID:
+				TxStruct.MID = (uint8_t)Pull(&RxBuf);
+				if (TxStruct.MID > 68)
+				{
+					print("Invalid MID. Buffer clean \n\r");
+					Clear(&RxBuf);
+					RecievedPacket = getPriority;
+				}
+				else
+				{
+					RecievedPacket = getData;
+				}
+				break;
+
+			case getData:
+				if (countDataParsed < TxStruct.Size - 1)
+				{
+					TxStruct.Data[countDataParsed++] = (uint8_t)Pull(&RxBuf);
+				}
+				else
+				{
+					TxStruct.Data[countDataParsed] = (uint8_t)Pull(&RxBuf);
+					countDataParsed = 0;
+					RecievedPacket = Complete;
+					print("Packet completed\n\r");
+				}
+				break;
+
+			case Complete:
+				__NOP();
+				break;
+			}
 		}
 	}
 }
@@ -174,11 +184,37 @@ static inline void SysInit(void)
 	CLK_Init();
 	GPIO_Init();
 	usbd_core_init(&usb_device_dev);
-	USART0_Init();
+	//USART0_Init();
 	USART1_Init();
 	TIM0_Init();
 	TIM1_Init();
 	// Clear all of buffers
 	Clear(&RxBuf);
 	Clear(&TxBuf);
+}
+
+static inline void usbd_polling(void)
+{
+	// This part of code parse inout data buff
+	/*******************************************************************************/
+	// USBD chech buffer
+	if (USBD_CONFIGURED == usb_device_dev.status)
+	{
+		if (1 == packet_receive)
+		{
+			cdc_acm_data_receive(&usb_device_dev);
+		}
+		else
+		{
+			if (0 != receive_length)
+			{
+				// cdc_acm_data_send(&usb_device_dev, receive_length);
+				for (uint8_t i = 0; i < receive_length; ++i)
+				{
+					Push(&RxBuf, usb_data_buffer[i]);
+				}
+				receive_length = 0;
+			}
+		}
+	}
 }

@@ -418,7 +418,7 @@ void  usbd_ep_data_write(uint8_t *user_fifo, uint16_t usbram_addr, uint16_t byte
     uint32_t *write_addr = (uint32_t *)((uint32_t)(usbram_addr * 2U + USBD_RAM));
 
     for (n = 0U; n < (bytes + 1U) / 2U; n++) {
-        *write_addr++ = *((__attribute__((packed)) uint16_t*)user_fifo);
+        *write_addr++ = *((__packed uint16_t*)user_fifo);
         user_fifo += 2U;
     }
 }
@@ -437,7 +437,7 @@ void  usbd_ep_data_read(uint8_t *user_fifo, uint16_t usbram_addr, uint16_t bytes
     uint32_t *read_addr = (uint32_t *)((uint32_t)(usbram_addr * 2U + USBD_RAM));
 
     for (n = 0U; n < (bytes + 1U) / 2U; n++) {
-        *((__attribute__((packed)) uint16_t*)user_fifo) = (uint16_t)*read_addr++;
+        *((__packed uint16_t*)user_fifo) = (uint16_t)*read_addr++;
         user_fifo += 2U;
     }
 }
